@@ -1,0 +1,58 @@
+name: Build GrsProbe (ARM Windows CE)
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:20.04
+
+    steps:
+    - name: Kaynak kodu indir
+      uses: actions/checkout@v4
+
+    - name: Bağımlılıkları kur
+      run: |
+        apt-get update -qq
+        DEBIAN_FRONTEND=noninteractive apt-get install -y \
+          build-essential wget curl tar bzip2 file ca-certificates
+
+    - name: mingw32ce toolchain indir
+      run: |
+        for URL in \
+          "https://netcologne.dl.sourceforge.net/project/cegcc/mingw32ce/mingw32ce-0.59.1/mingw32ce-0.59.1-linux-i386.tar.bz2" \
+          "https://vorboss.dl.sourceforge.net/project/cegcc/mingw32ce/mingw32ce-0.59.1/mingw32ce-0.59.1-linux-i386.tar.bz2" \
+          "https://jztkft.dl.sourceforge.net/project/cegcc/mingw32ce/mingw32ce-0.59.1/mingw32ce-0.59.1-linux-i386.tar.bz2"
+        do
+          echo "Deneniyor: $URL"
+          wget -q --timeout=60 "$URL" -O /tmp/tc.tar.bz2 && \
+            [ $(stat -c%s /tmp/tc.tar.bz2) -gt 100000 ] && break || \
+            echo "Basarisiz..."
+        done
+        mkdir -p /opt/mingw32ce
+        tar xjf /tmp/tc.tar.bz2 -C /opt/mingw32ce --strip-components=1
+        /opt/mingw32ce/bin/arm-mingw32ce-g++ --version
+
+    - name: Derle
+      run: |
+        /opt/mingw32ce/bin/arm-mingw32ce-g++ \
+          -DUNICODE -D_UNICODE \
+          -D_WIN32_WCE=0x0500 -DUNDER_CE=0x0500 \
+          -DWIN32 -DARM -O1 \
+          -fno-exceptions -fno-rtti \
+          -mwindows -mthumb -march=armv4t \
+          -o GrsProbe.exe GrsProbe.cpp \
+          -lcoredll -lcommctrl
+        ls -lh GrsProbe.exe
+        file GrsProbe.exe
+
+    - name: Artifact yukle
+      uses: actions/upload-artifact@v4
+      with:
+        name: GrsProbe-ARM-WinCE
+        path: GrsProbe.exe
+        retention-days: 30
