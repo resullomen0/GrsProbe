@@ -1,0 +1,5 @@
+*.o
+*.obj
+*.pdb
+Release_ARMV4I/
+Debug_ARMV4I/

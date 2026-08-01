@@ -1,0 +1,64 @@
+GrsProbe - Derleme ve Kullanım Talimatı
+========================================
+
+NE YAPAR:
+---------
+- Windows CE ARM cihazda çalışır
+- Galileo GRS runtime'ın shared memory alanlarını tarar
+- Tüm çalışan process'leri, yüklü modülleri ve bellek durumunu kaydeder
+- Sonucu \StorageCard\data\grs_probe.xml dosyasına yazar
+- Küçük GUI: "Tara ve Kaydet" + "Kapat" butonu
+
+GÜVENLİK:
+----------
+- Sadece READ erişimi kullanır, hiçbir şeye YAZMIYOR
+- Galileo process'ine müdahale etmez
+- Dosya boyutu küçük tutulmuştur (max ~50KB)
+
+DERLEME SEÇENEKLERİ:
+---------------------
+
+SEÇENEK 1 - Visual Studio 2005 veya 2008:
+  1. "Visual Studio 2005/2008 Smart Device" eklentisini kur
+  2. GrsProbe.vcproj dosyasını aç
+  3. Platform: "ARMV4I" seç
+  4. Build -> Build Solution (Ctrl+Shift+B)
+  5. Release_ARMV4I\GrsProbe.exe çıkar
+
+SEÇENEK 2 - Ücretsiz: mingw32ce (Linux/Windows):
+  1. http://cegcc.sourceforge.net/ adresinden indir
+  2. Komut:
+     arm-mingw32ce-g++ -DUNICODE -D_UNICODE -D_WIN32_WCE=0x0500 ^
+       -DWIN32 -O1 -fno-exceptions -fno-rtti ^
+       -mwindows -o GrsProbe.exe GrsProbe.cpp ^
+       -lcoredll -lcommctrl
+
+SEÇENEK 3 - Online cross-compile servisi:
+  - Bazı online ARM WinCE derleyici servisleri var
+
+CIHAZA YÜKLEME:
+---------------
+1. FTP ile cihaza bağlan
+2. GrsProbe.exe dosyasını \StorageCard\ dizinine kopyala:
+   ftp> put GrsProbe.exe \StorageCard\GrsProbe.exe
+3. Cihazda dosyayı çalıştır (CERemoteSvr veya Galileo file manager ile)
+4. "Tara ve Kaydet" butonuna bas
+5. Tarama tamamlanınca FTP ile geri al:
+   ftp> get \StorageCard\data\grs_probe.xml
+
+ÇIKTI DOSYASI:
+--------------
+\StorageCard\data\grs_probe.xml
+
+İçeriği:
+- <memory_status>  : RAM kullanımı
+- <processes>      : Çalışan tüm process'ler ve PID'leri
+- <modules>        : Galileo'nun yüklü DLL'leri (driver isimlerini gösterir)
+- <known_maps>     : Bulunan shared memory alanları ve içerikleri
+
+ÖNEMLI:
+-------
+- data/ klasörü yoksa otomatik oluşturmaz, önceden var olmalı
+  (hmi_danf398.pwm zaten orada, yani klasör var)
+- Uygulama çalışırken Galileo'ya dokunmaz, makine durumu etkilenmez
+- Tarama ~5-10 saniye sürer

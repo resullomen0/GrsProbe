@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Visual Studio 2005/2008 Smart Device Project
+    Platform: Windows CE 5.0 / 6.0 - ARMV4I
+    Açmak için: VS2005/2008 + Smart Device eklentisi gerekli
+-->
+<VisualStudioProject
+    ProjectType="Visual C++"
+    Version="8.00"
+    Name="GrsProbe"
+    ProjectGUID="{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
+    Keyword="Win32Proj">
+    <Platforms>
+        <Platform Name="ARMV4I"/>
+    </Platforms>
+    <Configurations>
+        <Configuration
+            Name="Release|ARMV4I"
+            OutputDirectory=".\Release_ARMV4I"
+            IntermediateDirectory=".\Release_ARMV4I"
+            ConfigurationType="1"
+            CharacterSet="1"
+            DeploymentType="0">
+            <Tool
+                Name="VCCLCompilerTool"
+                Optimization="1"
+                PreprocessorDefinitions="WIN32;_WIN32_WCE=$(CEVER);UNDER_CE=$(CEVER);WINCE;NDEBUG;$(PLATFORMDEFINES);UNICODE;_UNICODE"
+                MinimalRebuild="true"
+                RuntimeLibrary="2"
+                UsePrecompiledHeader="0"
+                WarningLevel="3"
+                DebugInformationFormat="0"
+                ExceptionHandling="0"
+                RuntimeTypeInfo="false"/>
+            <Tool
+                Name="VCLinkerTool"
+                AdditionalDependencies="coredll.lib commctrl.lib"
+                OutputFile="$(OutDir)\GrsProbe.exe"
+                LinkIncremental="1"
+                SubSystem="9"
+                EntryPointSymbol="WinMainCRTStartup"
+                ImportLibrary="$(OutDir)\GrsProbe.lib"/>
+        </Configuration>
+        <Configuration
+            Name="Debug|ARMV4I"
+            OutputDirectory=".\Debug_ARMV4I"
+            IntermediateDirectory=".\Debug_ARMV4I"
+            ConfigurationType="1"
+            CharacterSet="1">
+            <Tool
+                Name="VCCLCompilerTool"
+                Optimization="0"
+                PreprocessorDefinitions="WIN32;_WIN32_WCE=$(CEVER);UNDER_CE=$(CEVER);WINCE;DEBUG;$(PLATFORMDEFINES);UNICODE;_UNICODE"
+                RuntimeLibrary="2"
+                UsePrecompiledHeader="0"
+                WarningLevel="3"
+                ExceptionHandling="0"
+                RuntimeTypeInfo="false"/>
+            <Tool
+                Name="VCLinkerTool"
+                AdditionalDependencies="coredll.lib commctrl.lib"
+                OutputFile="$(OutDir)\GrsProbe.exe"
+                SubSystem="9"
+                EntryPointSymbol="WinMainCRTStartup"/>
+        </Configuration>
+    </Configurations>
+    <Files>
+        <Filter Name="Source Files">
+            <File RelativePath=".\GrsProbe.cpp"/>
+        </Filter>
+    </Files>
+</VisualStudioProject>
