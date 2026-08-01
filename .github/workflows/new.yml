@@ -1,0 +1,53 @@
+name: Build GrsProbe (ARM Windows CE)
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/enlyze/windows-ce-build-environment:latest
+
+    steps:
+    - name: Kaynak kodu indir
+      uses: actions/checkout@v4
+
+    - name: Toolchain kontrol
+      run: |
+        arm-wince-mingw32ce-g++ --version || \
+        arm-mingw32ce-g++ --version || \
+        ls /usr/local/bin/*arm* 2>/dev/null || \
+        ls /opt/*/bin/ 2>/dev/null || \
+        find / -name "*mingw32ce*" -type f 2>/dev/null | head -20
+
+    - name: Derle
+      run: |
+        # Hangi compiler adı çalışıyorsa onu kullan
+        CC=""
+        for name in arm-wince-mingw32ce-g++ arm-mingw32ce-g++ arm-wince-cegcc-g++; do
+          if command -v $name &>/dev/null; then
+            CC=$name
+            break
+          fi
+        done
+        echo "Compiler: $CC"
+        $CC \
+          -DUNICODE -D_UNICODE \
+          -D_WIN32_WCE=0x0500 -DUNDER_CE=0x0500 \
+          -DWIN32 -DARM -O1 \
+          -fno-exceptions -fno-rtti \
+          -mwindows -mthumb -march=armv4t \
+          -o GrsProbe.exe GrsProbe.cpp \
+          -lcoredll -lcommctrl
+        ls -lh GrsProbe.exe
+        file GrsProbe.exe
+
+    - name: Artifact yukle
+      uses: actions/upload-artifact@v4
+      with:
+        name: GrsProbe-ARM-WinCE
+        path: GrsProbe.exe
+        retention-days: 30
